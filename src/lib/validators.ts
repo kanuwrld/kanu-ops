@@ -26,7 +26,9 @@ export const taskCreateSchema = z.object({
 export const taskUpdateSchema = z.object({
   status: z.enum(["OPEN", "IN_PROGRESS", "REVIEW", "DONE"]).optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).optional(),
+  type: z.enum(["FEATURE", "BUG", "CHORE", "RESEARCH", "RELEASE"]).optional(),
   progress: z.number().int().min(0).max(100).optional(),
+  order: z.number().int().min(0).optional(),
   title: z.string().trim().min(2).max(120).optional(),
   description: z.string().trim().max(1000).optional(),
 });

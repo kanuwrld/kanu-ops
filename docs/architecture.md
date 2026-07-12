@@ -48,8 +48,10 @@ The interface is dense and operational:
 
 - left sidebar: projects, totals, quick project creation
 - top workspace header: selected project and branch tabs
-- board area: four-column kanban
-- right drawer: task detail, progress, notes, activity context
+- branch analytics: task count, active/review/done split, notes, high-priority work
+- board area: four-column kanban with drag-and-drop status changes
+- board controls: task search plus priority and type filters
+- right drawer: editable task detail, progress, notes, activity context
 
 The app avoids a marketing landing page. First screen is the working product.
 
@@ -67,5 +69,5 @@ Route handlers run on the Node.js runtime because SQLite native bindings are ser
 ## Tradeoffs
 
 - No auth in MVP. Current mode is single-user local operations.
-- No drag-and-drop yet. Explicit movement buttons keep logic simple and testable.
+- Drag-and-drop currently changes status; explicit buttons stay as accessible fallback controls.
 - Snapshot refresh after mutation is less efficient than optimistic patching, but simpler and safer at this stage.

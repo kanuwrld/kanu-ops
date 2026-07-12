@@ -19,8 +19,10 @@ project -> branch -> kanban task -> private note -> activity log
 - Project sidebar with health, progress, branch, and task counts
 - Branch-focused workspace for goals and delivery progress
 - Dense kanban board with `Open`, `In work`, `Review`, and `Done`
+- Drag-and-drop movement between board columns
+- Search, priority, and task-type filters for focused work
 - Fast task creation without leaving board context
-- Task drawer with status controls, progress, metadata, and private notes
+- Editable task drawer with status controls, manual progress, metadata, and private notes
 - SQLite-backed activity log for project, branch, task, and note events
 - Typed repository layer that keeps database access out of React components
 - Seed/reset scripts for fast local demo setup
@@ -73,7 +75,7 @@ npm run db:reset   # reset SQLite database and seed demo data
 
 ## Roadmap
 
-- Drag-and-drop task ordering
+- Drag-and-drop ordering inside each column
 - Project-level milestones and delivery dates
 - GitHub repository sync for branch/task context
 - Optional auth layer for hosted multi-user mode

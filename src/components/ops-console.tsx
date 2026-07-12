@@ -6,9 +6,12 @@ import {
   Check,
   Clock3,
   GitBranch,
+  GripVertical,
   LayoutDashboard,
   MessageSquare,
   Plus,
+  Save,
+  Search,
   ShieldCheck,
   Target,
 } from "lucide-react";
@@ -81,6 +84,11 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
   const [selectedTaskId, setSelectedTaskId] = useState("");
   const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<"ALL" | TaskPriority>("ALL");
+  const [typeFilter, setTypeFilter] = useState<"ALL" | TaskType>("ALL");
+  const [draggedTaskId, setDraggedTaskId] = useState("");
+  const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | "">("");
   const [projectDraft, setProjectDraft] = useState({
     name: "",
     summary: "",
@@ -120,6 +128,43 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
     const tasks = selectedProject?.branches.flatMap((branch) => branch.tasks) ?? [];
     return tasks.find((task) => task.id === selectedTaskId) ?? null;
   }, [selectedProject, selectedTaskId]);
+
+  const branchTasks = useMemo(() => selectedBranch?.tasks ?? [], [selectedBranch]);
+
+  const filteredTasks = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return branchTasks.filter((task) => {
+      const matchesQuery =
+        !query ||
+        task.title.toLowerCase().includes(query) ||
+        task.description.toLowerCase().includes(query);
+      const matchesPriority =
+        priorityFilter === "ALL" || task.priority === priorityFilter;
+      const matchesType = typeFilter === "ALL" || task.type === typeFilter;
+
+      return matchesQuery && matchesPriority && matchesType;
+    });
+  }, [branchTasks, priorityFilter, searchQuery, typeFilter]);
+
+  const branchStats = useMemo(() => {
+    const done = branchTasks.filter((task) => task.status === "DONE").length;
+    const active = branchTasks.filter((task) => task.status === "IN_PROGRESS").length;
+    const review = branchTasks.filter((task) => task.status === "REVIEW").length;
+    const notes = branchTasks.reduce((sum, task) => sum + task.comments.length, 0);
+    const highSignal = branchTasks.filter(
+      (task) => task.priority === "HIGH" || task.priority === "CRITICAL",
+    ).length;
+
+    return {
+      total: branchTasks.length,
+      done,
+      active,
+      review,
+      notes,
+      highSignal,
+    };
+  }, [branchTasks]);
 
   async function mutate(path: string, body: unknown, method = "POST") {
     setIsMutating(true);
@@ -199,6 +244,28 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
 
   async function moveTask(task: Task, status: TaskStatus) {
     await mutate(`/api/tasks/${task.id}`, { status }, "PATCH");
+  }
+
+  async function saveTaskDetails(
+    task: Task,
+    input: {
+      title: string;
+      description: string;
+      priority: TaskPriority;
+      type: TaskType;
+      progress: number;
+    },
+  ) {
+    await mutate(`/api/tasks/${task.id}`, input, "PATCH");
+  }
+
+  async function dropTaskInto(status: TaskStatus, droppedTaskId: string) {
+    const task = branchTasks.find((candidate) => candidate.id === droppedTaskId);
+    setDragOverStatus("");
+    setDraggedTaskId("");
+
+    if (!task || task.status === status) return;
+    await moveTask(task, status);
   }
 
   async function addNote() {
@@ -378,6 +445,14 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                           <p className="mt-2 max-w-3xl text-sm text-neutral-400">
                             {selectedBranch?.goal}
                           </p>
+                          <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                            <MiniStat label="Tasks" value={branchStats.total} />
+                            <MiniStat label="Active" value={branchStats.active} />
+                            <MiniStat label="Review" value={branchStats.review} />
+                            <MiniStat label="Done" value={branchStats.done} />
+                            <MiniStat label="Notes" value={branchStats.notes} />
+                            <MiniStat label="High" value={branchStats.highSignal} />
+                          </div>
                         </div>
                         <div className="min-w-20 text-right">
                           <p className="text-2xl font-semibold">{selectedBranch?.progress ?? 0}%</p>
@@ -498,17 +573,79 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                     {error ? <p className="mt-2 text-sm text-red-300">{error}</p> : null}
                   </div>
 
+                  <div className="mb-4 grid gap-2 border border-neutral-800 p-3 lg:grid-cols-[1fr_170px_170px]">
+                    <label className="relative block">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-500" />
+                      <input
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="Search task title or context"
+                        className="h-10 w-full border border-neutral-800 bg-neutral-950 px-9 text-sm outline-none focus:border-neutral-500"
+                      />
+                    </label>
+                    <select
+                      value={priorityFilter}
+                      onChange={(event) =>
+                        setPriorityFilter(event.target.value as "ALL" | TaskPriority)
+                      }
+                      className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                    >
+                      <option value="ALL">All priorities</option>
+                      {(["LOW", "MEDIUM", "HIGH", "CRITICAL"] as TaskPriority[]).map(
+                        (priority) => (
+                          <option key={priority} value={priority}>
+                            {priority}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                    <select
+                      value={typeFilter}
+                      onChange={(event) =>
+                        setTypeFilter(event.target.value as "ALL" | TaskType)
+                      }
+                      className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                    >
+                      <option value="ALL">All types</option>
+                      {Object.entries(typeLabels).map(([type, label]) => (
+                        <option key={type} value={type}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="grid min-h-[500px] gap-3 xl:grid-cols-4">
                     {columns.map((column) => {
-                      const tasks =
-                        selectedBranch?.tasks.filter(
-                          (task) => task.status === column.status,
-                        ) ?? [];
+                      const tasks = filteredTasks.filter(
+                        (task) => task.status === column.status,
+                      );
 
                       return (
                         <section
                           key={column.status}
-                          className="min-h-[300px] border border-neutral-800 bg-neutral-950"
+                          onDragOver={(event) => {
+                            event.preventDefault();
+                            setDragOverStatus(column.status);
+                          }}
+                          onDragLeave={() => setDragOverStatus("")}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            dropTaskInto(
+                              column.status,
+                              event.dataTransfer.getData("text/plain") || draggedTaskId,
+                            );
+                          }}
+                          onPointerUp={() => {
+                            if (draggedTaskId) dropTaskInto(column.status, draggedTaskId);
+                          }}
+                          data-kanban-column={column.status}
+                          className={cx(
+                            "min-h-[300px] border bg-neutral-950 transition",
+                            dragOverStatus === column.status
+                              ? "border-neutral-300"
+                              : "border-neutral-800",
+                          )}
                         >
                           <div className="flex h-12 items-center justify-between border-b border-neutral-800 px-3">
                             <div>
@@ -527,8 +664,18 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                                 selected={selectedTask?.id === task.id}
                                 onSelect={() => setSelectedTaskId(task.id)}
                                 onMove={moveTask}
+                                onDragStart={(taskId) => setDraggedTaskId(taskId)}
+                                onDragEnd={() => {
+                                  setDraggedTaskId("");
+                                  setDragOverStatus("");
+                                }}
                               />
                             ))}
+                            {tasks.length === 0 ? (
+                              <div className="border border-dashed border-neutral-800 p-4 text-center text-xs text-neutral-500">
+                                Drop task here
+                              </div>
+                            ) : null}
                           </div>
                         </section>
                       );
@@ -544,6 +691,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                       setNoteDraft={setNoteDraft}
                       addNote={addNote}
                       moveTask={moveTask}
+                      onSave={saveTaskDetails}
                       disabled={isMutating}
                     />
                   ) : (
@@ -592,16 +740,31 @@ function Metric({ label, value }: { label: string; value: string | number }) {
   );
 }
 
+function MiniStat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="border border-neutral-800 px-2 py-1.5">
+      <p className="font-semibold">{value}</p>
+      <p className="mt-0.5 text-[10px] uppercase text-neutral-500">
+        {label}
+      </p>
+    </div>
+  );
+}
+
 function TaskCard({
   task,
   selected,
   onSelect,
   onMove,
+  onDragStart,
+  onDragEnd,
 }: {
   task: Task;
   selected: boolean;
   onSelect: () => void;
   onMove: (task: Task, status: TaskStatus) => void;
+  onDragStart: (taskId: string) => void;
+  onDragEnd: () => void;
 }) {
   const nextStatus =
     task.status === "OPEN"
@@ -614,8 +777,18 @@ function TaskCard({
 
   return (
     <article
+      draggable
+      data-task-id={task.id}
+      data-task-status={task.status}
+      onPointerDown={() => onDragStart(task.id)}
+      onDragStart={(event) => {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", task.id);
+        onDragStart(task.id);
+      }}
+      onDragEnd={onDragEnd}
       className={cx(
-        "border p-3 transition",
+        "cursor-grab border p-3 transition active:cursor-grabbing",
         selected
           ? "border-neutral-100 bg-neutral-900"
           : "border-neutral-800 bg-neutral-900/40 hover:border-neutral-500",
@@ -623,7 +796,10 @@ function TaskCard({
     >
       <button type="button" onClick={onSelect} className="block w-full text-left">
         <div className="flex items-start justify-between gap-3">
-          <h4 className="text-sm font-semibold leading-5">{task.title}</h4>
+          <div className="flex min-w-0 items-start gap-2">
+            <GripVertical className="mt-0.5 size-4 shrink-0 text-neutral-600" />
+            <h4 className="text-sm font-semibold leading-5">{task.title}</h4>
+          </div>
           <span
             className={cx(
               "shrink-0 border px-1.5 py-0.5 text-[10px] font-semibold",
@@ -663,6 +839,7 @@ function TaskDrawer({
   setNoteDraft,
   addNote,
   moveTask,
+  onSave,
   disabled,
 }: {
   task: Task;
@@ -670,16 +847,102 @@ function TaskDrawer({
   setNoteDraft: (value: string) => void;
   addNote: () => void;
   moveTask: (task: Task, status: TaskStatus) => void;
+  onSave: (
+    task: Task,
+    input: {
+      title: string;
+      description: string;
+      priority: TaskPriority;
+      type: TaskType;
+      progress: number;
+    },
+  ) => void;
   disabled: boolean;
 }) {
+  function saveTask(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    onSave(task, {
+      title: String(form.get("title") ?? task.title),
+      description: String(form.get("description") ?? task.description),
+      priority: String(form.get("priority") ?? task.priority) as TaskPriority,
+      type: String(form.get("type") ?? task.type) as TaskType,
+      progress: Number(form.get("progress") ?? task.progress),
+    });
+  }
+
   return (
     <section className="border border-neutral-800">
       <div className="border-b border-neutral-800 p-4">
         <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">
           <ShieldCheck className="size-3.5" /> Private task
         </p>
-        <h3 className="text-xl font-semibold leading-7">{task.title}</h3>
-        <p className="mt-2 text-sm text-neutral-400">{task.description || "No description."}</p>
+        <form className="space-y-3" onSubmit={saveTask}>
+          <input
+            key={`${task.id}-title`}
+            name="title"
+            defaultValue={task.title}
+            className="h-10 w-full border border-neutral-800 bg-neutral-950 px-3 text-lg font-semibold outline-none focus:border-neutral-500"
+          />
+          <textarea
+            key={`${task.id}-description`}
+            name="description"
+            defaultValue={task.description}
+            rows={3}
+            placeholder="No description."
+            className="w-full resize-none border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none focus:border-neutral-500"
+          />
+          <div className="grid grid-cols-[1fr_1fr_90px] gap-2">
+            <select
+              key={`${task.id}-priority`}
+              name="priority"
+              defaultValue={task.priority}
+              className="h-9 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+            >
+              {(["LOW", "MEDIUM", "HIGH", "CRITICAL"] as TaskPriority[]).map(
+                (priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ),
+              )}
+            </select>
+            <select
+              key={`${task.id}-type`}
+              name="type"
+              defaultValue={task.type}
+              className="h-9 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+            >
+              {Object.entries(typeLabels).map(([type, label]) => (
+                <option key={type} value={type}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              disabled={disabled}
+              className="flex h-9 items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
+            >
+              <Save className="size-4" /> Save
+            </button>
+          </div>
+          <label className="block">
+            <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.18em] text-neutral-500">
+              <span>Manual progress</span>
+              <span>{task.progress}%</span>
+            </div>
+            <input
+              key={`${task.id}-progress`}
+              name="progress"
+              type="range"
+              min="0"
+              max="100"
+              defaultValue={task.progress}
+              className="w-full accent-neutral-100"
+            />
+          </label>
+        </form>
       </div>
 
       <div className="grid grid-cols-2 border-b border-neutral-800 text-sm">

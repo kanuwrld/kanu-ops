@@ -311,6 +311,18 @@ function updateBranchProgress(branchId: string) {
   );
 }
 
+function nextOrderForStatus(branchId: string, status: TaskStatus, excludeTaskId?: string) {
+  const db = getDatabase();
+  const row = db
+    .prepare(
+      `SELECT COALESCE(MAX(order_index), -1) + 1 AS next_order
+       FROM tasks
+       WHERE branch_id = ? AND status = ? AND id != ?`,
+    )
+    .get(branchId, status, excludeTaskId ?? "") as { next_order: number };
+  return row.next_order;
+}
+
 export function getWorkspaceSnapshot(): WorkspaceSnapshot {
   const db = getDatabase();
   const projects = db
@@ -513,7 +525,9 @@ export function updateTask(
   input: {
     status?: TaskStatus;
     priority?: TaskPriority;
+    type?: TaskType;
     progress?: number;
+    order?: number;
     title?: string;
     description?: string;
   },
@@ -527,21 +541,28 @@ export function updateTask(
     if (!existing) throw new Error("Task not found");
 
     const status = input.status ?? existing.status;
+    const movedToNewStatus = status !== existing.status;
     const progress =
       input.progress ??
       (input.status ? nextTaskProgress(input.status, existing.progress) : existing.progress);
+    const order = input.order ?? (movedToNewStatus
+      ? nextOrderForStatus(existing.branch_id, status, taskId)
+      : existing.order_index);
     const updatedAt = now();
 
     db.prepare(
       `UPDATE tasks
-       SET title = ?, description = ?, status = ?, priority = ?, progress = ?, updated_at = ?
+       SET title = ?, description = ?, status = ?, priority = ?, type = ?,
+           progress = ?, order_index = ?, updated_at = ?
        WHERE id = ?`,
     ).run(
       input.title ?? existing.title,
       input.description ?? existing.description,
       status,
       input.priority ?? existing.priority,
+      input.type ?? existing.type,
       progress,
+      order,
       updatedAt,
       taskId,
     );
