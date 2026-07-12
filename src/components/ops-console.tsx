@@ -284,21 +284,21 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="border-b border-neutral-800 bg-neutral-950/95 p-4 lg:border-b-0 lg:border-r">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center border border-neutral-700 bg-neutral-900">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[304px_minmax(0,1fr)]">
+        <aside className="border-b border-neutral-800 bg-neutral-950/95 p-5 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r">
+          <div className="mb-8 flex items-center gap-3">
+            <div className="flex size-11 items-center justify-center border border-neutral-700 bg-neutral-900">
               <LayoutDashboard className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-neutral-400">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-neutral-400">
                 Kanu Ops
               </p>
               <h1 className="text-xl font-semibold">Command center</h1>
             </div>
           </div>
 
-          <div className="mb-5 grid grid-cols-3 gap-2">
+          <div className="mb-6 grid grid-cols-3 gap-2.5">
             <Metric label="Projects" value={workspace.totals.projects} />
             <Metric label="Branches" value={workspace.totals.branches} />
             <Metric label="Done" value={workspace.totals.done} />
@@ -311,7 +311,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
               </h2>
               <span className="text-xs text-neutral-500">{workspace.totals.tasks} tasks</span>
             </div>
-            <div className="max-h-[34vh] space-y-2 overflow-y-auto pr-1 lg:max-h-[42vh]">
+            <div className="max-h-[34vh] space-y-2.5 overflow-y-auto pr-1 lg:max-h-[42vh]">
               {workspace.projects.map((project) => (
                 <button
                   key={project.id}
@@ -322,7 +322,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                     setSelectedTaskId("");
                   }}
                   className={cx(
-                    "w-full border p-3 text-left transition",
+                    "w-full border p-4 text-left transition",
                     selectedProjectId === project.id
                       ? "border-neutral-200 bg-neutral-100 text-neutral-950"
                       : "border-neutral-800 bg-neutral-900/50 text-neutral-200 hover:border-neutral-500",
@@ -338,7 +338,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
             </div>
           </section>
 
-          <section className="mt-5 border border-neutral-800 p-3">
+          <section className="mt-6 border border-neutral-800 p-4">
             <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
               <Plus className="size-3.5" /> New project
             </h2>
@@ -349,7 +349,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                   setProjectDraft((draft) => ({ ...draft, name: event.target.value }))
                 }
                 placeholder="Project name"
-                className="h-9 w-full border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                className="h-11 w-full border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
               />
               <textarea
                 value={projectDraft.summary}
@@ -361,13 +361,13 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                 }
                 placeholder="Short purpose"
                 rows={3}
-                className="w-full resize-none border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+                className="w-full resize-none border border-neutral-800 bg-neutral-950 px-3 py-2.5 text-sm outline-none focus:border-neutral-500"
               />
               <button
                 type="button"
                 onClick={createProjectFromDraft}
                 disabled={isMutating}
-                className="flex h-9 w-full items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
+                className="flex h-11 w-full items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
               >
                 <Plus className="size-4" /> Create
               </button>
@@ -387,28 +387,28 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
             </div>
           ) : (
             <div className="flex min-h-screen flex-col">
-              <header className="border-b border-neutral-800 p-4 xl:p-5">
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <header className="border-b border-neutral-800 p-5 xl:p-6">
+                <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                   <div>
                     <p className="mb-2 text-xs font-semibold uppercase tracking-[0.26em] text-neutral-500">
                       {selectedProject?.slug}
                     </p>
-                    <h2 className="text-3xl font-semibold tracking-tight">
+                    <h2 className="text-4xl font-semibold tracking-tight">
                       {selectedProject?.name}
                     </h2>
-                    <p className="mt-2 max-w-3xl text-sm text-neutral-400">
+                    <p className="mt-3 max-w-3xl text-base leading-7 text-neutral-400">
                       {selectedProject?.summary}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 xl:w-[360px]">
+                  <div className="grid grid-cols-3 gap-3 xl:w-[420px]">
                     <Metric label="Health" value={`${selectedProject?.healthScore ?? 0}%`} />
                     <Metric label="Progress" value={`${selectedProject ? projectProgress(selectedProject) : 0}%`} />
                     <Metric label="Logs" value={selectedProject?.logs.length ?? 0} />
                   </div>
                 </div>
 
-                <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+                <div className="mt-6 flex gap-3 overflow-x-auto pb-1">
                   {selectedProject?.branches.map((branch) => (
                     <button
                       key={branch.id}
@@ -418,7 +418,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                         setSelectedTaskId("");
                       }}
                       className={cx(
-                        "flex h-10 shrink-0 items-center gap-2 border px-3 text-sm transition",
+                        "flex h-11 shrink-0 items-center gap-2 border px-4 text-sm transition",
                         selectedBranch?.id === branch.id
                           ? "border-neutral-100 bg-neutral-100 text-neutral-950"
                           : "border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-500",
@@ -432,10 +432,10 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                 </div>
               </header>
 
-              <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px]">
-                <div className="min-w-0 p-4 xl:p-5">
-                  <div className="mb-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_380px]">
-                    <div className="border border-neutral-800 p-4">
+              <div className="grid min-h-0 flex-1 grid-cols-1 min-[2100px]:grid-cols-[minmax(0,1fr)_430px]">
+                <div className="min-w-0 p-5 xl:p-6">
+                  <div className="mb-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+                    <div className="border border-neutral-800 p-5">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h3 className="flex items-center gap-2 text-lg font-semibold">
@@ -445,7 +445,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                           <p className="mt-2 max-w-3xl text-sm text-neutral-400">
                             {selectedBranch?.goal}
                           </p>
-                          <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                          <div className="mt-5 grid grid-cols-2 gap-2.5 text-xs sm:grid-cols-3 xl:grid-cols-6">
                             <MiniStat label="Tasks" value={branchStats.total} />
                             <MiniStat label="Active" value={branchStats.active} />
                             <MiniStat label="Review" value={branchStats.review} />
@@ -463,7 +463,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                       </div>
                     </div>
 
-                    <div className="border border-neutral-800 p-3">
+                    <div className="border border-neutral-800 p-4">
                       <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">
                         <GitBranch className="size-3.5" /> Branch
                       </h3>
@@ -477,13 +477,13 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                             }))
                           }
                           placeholder="branch name"
-                          className="h-9 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                          className="h-11 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
                         />
                         <button
                           type="button"
                           onClick={createBranchFromDraft}
                           disabled={isMutating}
-                          className="flex size-9 items-center justify-center bg-neutral-100 text-neutral-950 disabled:opacity-40"
+                          className="flex size-11 items-center justify-center bg-neutral-100 text-neutral-950 disabled:opacity-40"
                           title="Create branch"
                         >
                           <Plus className="size-4" />
@@ -497,14 +497,14 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                             }))
                           }
                           placeholder="goal"
-                          className="col-span-2 h-9 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                          className="col-span-2 h-11 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="mb-4 border border-neutral-800 p-3">
-                    <div className="grid gap-2 lg:grid-cols-[1fr_180px_150px_auto]">
+                  <div className="mb-5 border border-neutral-800 p-4">
+                    <div className="grid gap-3 xl:grid-cols-[minmax(320px,1fr)_190px_170px_auto]">
                       <input
                         value={taskDraft.title}
                         onChange={(event) =>
@@ -514,7 +514,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                           }))
                         }
                         placeholder="Create task without leaving board"
-                        className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                        className="h-12 border border-neutral-800 bg-neutral-950 px-4 text-sm outline-none focus:border-neutral-500"
                       />
                       <select
                         value={taskDraft.type}
@@ -524,7 +524,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                             type: event.target.value as TaskType,
                           }))
                         }
-                        className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                        className="h-12 border border-neutral-800 bg-neutral-950 px-4 text-sm outline-none focus:border-neutral-500"
                       >
                         {Object.keys(typeLabels).map((type) => (
                           <option key={type} value={type}>
@@ -540,7 +540,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                             priority: event.target.value as TaskPriority,
                           }))
                         }
-                        className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                        className="h-12 border border-neutral-800 bg-neutral-950 px-4 text-sm outline-none focus:border-neutral-500"
                       >
                         {(["LOW", "MEDIUM", "HIGH", "CRITICAL"] as TaskPriority[]).map(
                           (priority) => (
@@ -554,7 +554,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                         type="button"
                         onClick={createTaskFromDraft}
                         disabled={isMutating}
-                        className="flex h-10 items-center justify-center gap-2 bg-neutral-100 px-4 text-sm font-semibold text-neutral-950 disabled:opacity-40"
+                        className="flex h-12 items-center justify-center gap-2 bg-neutral-100 px-5 text-sm font-semibold text-neutral-950 disabled:opacity-40"
                       >
                         <Plus className="size-4" /> Add
                       </button>
@@ -567,20 +567,20 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                           }))
                         }
                         placeholder="Optional context"
-                        className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500 lg:col-span-4"
+                        className="h-12 border border-neutral-800 bg-neutral-950 px-4 text-sm outline-none focus:border-neutral-500 xl:col-span-4"
                       />
                     </div>
                     {error ? <p className="mt-2 text-sm text-red-300">{error}</p> : null}
                   </div>
 
-                  <div className="mb-4 grid gap-2 border border-neutral-800 p-3 lg:grid-cols-[1fr_170px_170px]">
+                  <div className="mb-5 grid gap-3 border border-neutral-800 p-4 xl:grid-cols-[minmax(320px,1fr)_190px_190px]">
                     <label className="relative block">
                       <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-500" />
                       <input
                         value={searchQuery}
                         onChange={(event) => setSearchQuery(event.target.value)}
                         placeholder="Search task title or context"
-                        className="h-10 w-full border border-neutral-800 bg-neutral-950 px-9 text-sm outline-none focus:border-neutral-500"
+                        className="h-12 w-full border border-neutral-800 bg-neutral-950 px-10 text-sm outline-none focus:border-neutral-500"
                       />
                     </label>
                     <select
@@ -588,7 +588,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                       onChange={(event) =>
                         setPriorityFilter(event.target.value as "ALL" | TaskPriority)
                       }
-                      className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                      className="h-12 border border-neutral-800 bg-neutral-950 px-4 text-sm outline-none focus:border-neutral-500"
                     >
                       <option value="ALL">All priorities</option>
                       {(["LOW", "MEDIUM", "HIGH", "CRITICAL"] as TaskPriority[]).map(
@@ -604,7 +604,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                       onChange={(event) =>
                         setTypeFilter(event.target.value as "ALL" | TaskType)
                       }
-                      className="h-10 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+                      className="h-12 border border-neutral-800 bg-neutral-950 px-4 text-sm outline-none focus:border-neutral-500"
                     >
                       <option value="ALL">All types</option>
                       {Object.entries(typeLabels).map(([type, label]) => (
@@ -615,7 +615,13 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                     </select>
                   </div>
 
-                  <div className="grid min-h-[500px] gap-3 xl:grid-cols-4">
+                  <div
+                    className="grid min-h-[560px] gap-4"
+                    style={{
+                      gridTemplateColumns:
+                        "repeat(auto-fit, minmax(min(100%, 250px), 1fr))",
+                    }}
+                  >
                     {columns.map((column) => {
                       const tasks = filteredTasks.filter(
                         (task) => task.status === column.status,
@@ -641,13 +647,13 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                           }}
                           data-kanban-column={column.status}
                           className={cx(
-                            "min-h-[300px] border bg-neutral-950 transition",
+                            "min-h-[360px] border bg-neutral-950 transition",
                             dragOverStatus === column.status
                               ? "border-neutral-300"
                               : "border-neutral-800",
                           )}
                         >
-                          <div className="flex h-12 items-center justify-between border-b border-neutral-800 px-3">
+                          <div className="flex h-14 items-center justify-between border-b border-neutral-800 px-4">
                             <div>
                               <h3 className="text-sm font-semibold">{column.label}</h3>
                               <p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
@@ -656,7 +662,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                             </div>
                             <span className="text-sm text-neutral-400">{tasks.length}</span>
                           </div>
-                          <div className="max-h-[58vh] space-y-2 overflow-y-auto p-2">
+                          <div className="max-h-[64vh] space-y-3 overflow-y-auto p-3">
                             {tasks.map((task) => (
                               <TaskCard
                                 key={task.id}
@@ -672,7 +678,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                               />
                             ))}
                             {tasks.length === 0 ? (
-                              <div className="border border-dashed border-neutral-800 p-4 text-center text-xs text-neutral-500">
+                              <div className="border border-dashed border-neutral-800 p-6 text-center text-sm text-neutral-500">
                                 Drop task here
                               </div>
                             ) : null}
@@ -683,7 +689,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                   </div>
                 </div>
 
-                <aside className="border-t border-neutral-800 bg-neutral-950 p-4 xl:border-l xl:border-t-0 xl:p-5">
+                <aside className="grid gap-5 border-t border-neutral-800 bg-neutral-950 p-5 xl:grid-cols-[minmax(0,1fr)_380px] xl:p-6 min-[2100px]:block min-[2100px]:border-l min-[2100px]:border-t-0">
                   {selectedTask ? (
                     <TaskDrawer
                       task={selectedTask}
@@ -695,7 +701,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                       disabled={isMutating}
                     />
                   ) : (
-                    <div className="border border-neutral-800 p-5">
+                    <div className="border border-neutral-800 p-6">
                       <p className="text-xs font-semibold uppercase tracking-[0.26em] text-neutral-500">
                         Task detail
                       </p>
@@ -706,7 +712,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
                     </div>
                   )}
 
-                  <section className="mt-4 border border-neutral-800 p-4">
+                  <section className="border border-neutral-800 p-5 min-[2100px]:mt-5">
                     <h3 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
                       <Activity className="size-3.5" /> Activity
                     </h3>
@@ -733,7 +739,7 @@ export function OpsConsole({ initialWorkspace }: OpsConsoleProps) {
 
 function Metric({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="border border-neutral-800 bg-neutral-900/50 p-2">
+    <div className="border border-neutral-800 bg-neutral-900/50 p-3">
       <p className="text-lg font-semibold">{value}</p>
       <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">{label}</p>
     </div>
@@ -742,7 +748,7 @@ function Metric({ label, value }: { label: string; value: string | number }) {
 
 function MiniStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="border border-neutral-800 px-2 py-1.5">
+    <div className="border border-neutral-800 px-3 py-2">
       <p className="font-semibold">{value}</p>
       <p className="mt-0.5 text-[10px] uppercase text-neutral-500">
         {label}
@@ -788,7 +794,7 @@ function TaskCard({
       }}
       onDragEnd={onDragEnd}
       className={cx(
-        "cursor-grab border p-3 transition active:cursor-grabbing",
+        "cursor-grab border p-4 transition active:cursor-grabbing",
         selected
           ? "border-neutral-100 bg-neutral-900"
           : "border-neutral-800 bg-neutral-900/40 hover:border-neutral-500",
@@ -809,8 +815,10 @@ function TaskCard({
             {task.priority}
           </span>
         </div>
-        <p className="mt-2 line-clamp-2 text-xs text-neutral-400">{task.description}</p>
-        <div className="mt-3 h-1.5 bg-neutral-800">
+        <p className="mt-2 line-clamp-2 text-sm leading-5 text-neutral-400">
+          {task.description}
+        </p>
+        <div className="mt-4 h-1.5 bg-neutral-800">
           <div className="h-full bg-neutral-100" style={{ width: `${task.progress}%` }} />
         </div>
         <div className="mt-3 flex items-center justify-between text-xs text-neutral-500">
@@ -824,7 +832,7 @@ function TaskCard({
         <button
           type="button"
           onClick={() => onMove(task, nextStatus)}
-          className="mt-3 flex h-8 w-full items-center justify-center gap-2 border border-neutral-700 text-xs font-semibold text-neutral-200 hover:border-neutral-300"
+          className="mt-4 flex h-9 w-full items-center justify-center gap-2 border border-neutral-700 text-xs font-semibold text-neutral-200 hover:border-neutral-300"
         >
           Move <ArrowRight className="size-3.5" />
         </button>
@@ -873,16 +881,16 @@ function TaskDrawer({
 
   return (
     <section className="border border-neutral-800">
-      <div className="border-b border-neutral-800 p-4">
+      <div className="border-b border-neutral-800 p-5">
         <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">
           <ShieldCheck className="size-3.5" /> Private task
         </p>
-        <form className="space-y-3" onSubmit={saveTask}>
+        <form className="space-y-4" onSubmit={saveTask}>
           <input
             key={`${task.id}-title`}
             name="title"
             defaultValue={task.title}
-            className="h-10 w-full border border-neutral-800 bg-neutral-950 px-3 text-lg font-semibold outline-none focus:border-neutral-500"
+            className="h-12 w-full border border-neutral-800 bg-neutral-950 px-4 text-lg font-semibold outline-none focus:border-neutral-500"
           />
           <textarea
             key={`${task.id}-description`}
@@ -890,14 +898,14 @@ function TaskDrawer({
             defaultValue={task.description}
             rows={3}
             placeholder="No description."
-            className="w-full resize-none border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none focus:border-neutral-500"
+            className="w-full resize-none border border-neutral-800 bg-neutral-950 px-4 py-3 text-sm leading-6 text-neutral-300 outline-none focus:border-neutral-500"
           />
-          <div className="grid grid-cols-[1fr_1fr_90px] gap-2">
+          <div className="grid gap-3 sm:grid-cols-[1fr_1fr_110px]">
             <select
               key={`${task.id}-priority`}
               name="priority"
               defaultValue={task.priority}
-              className="h-9 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+              className="h-11 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
             >
               {(["LOW", "MEDIUM", "HIGH", "CRITICAL"] as TaskPriority[]).map(
                 (priority) => (
@@ -911,7 +919,7 @@ function TaskDrawer({
               key={`${task.id}-type`}
               name="type"
               defaultValue={task.type}
-              className="h-9 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
+              className="h-11 border border-neutral-800 bg-neutral-950 px-3 text-sm outline-none focus:border-neutral-500"
             >
               {Object.entries(typeLabels).map(([type, label]) => (
                 <option key={type} value={type}>
@@ -922,7 +930,7 @@ function TaskDrawer({
             <button
               type="submit"
               disabled={disabled}
-              className="flex h-9 items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
+              className="flex h-11 items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
             >
               <Save className="size-4" /> Save
             </button>
@@ -952,7 +960,7 @@ function TaskDrawer({
         <DetailCell label="Updated" value={formatDate(task.updatedAt)} />
       </div>
 
-      <div className="border-b border-neutral-800 p-4">
+      <div className="border-b border-neutral-800 p-5">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-xs uppercase tracking-[0.2em] text-neutral-500">Progress</span>
           <span className="text-sm font-semibold">{task.progress}%</span>
@@ -960,14 +968,14 @@ function TaskDrawer({
         <div className="h-2 bg-neutral-800">
           <div className="h-full bg-neutral-100" style={{ width: `${task.progress}%` }} />
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-3">
           {columns.map((column) => (
             <button
               key={column.status}
               type="button"
               disabled={disabled || task.status === column.status}
               onClick={() => moveTask(task, column.status)}
-              className="flex h-9 items-center justify-center gap-2 border border-neutral-800 text-xs font-semibold text-neutral-300 disabled:bg-neutral-900 disabled:text-neutral-600"
+              className="flex h-10 items-center justify-center gap-2 border border-neutral-800 text-xs font-semibold text-neutral-300 disabled:bg-neutral-900 disabled:text-neutral-600"
             >
               {column.status === "DONE" ? <Check className="size-3.5" /> : <Clock3 className="size-3.5" />}
               {column.label}
@@ -976,7 +984,7 @@ function TaskDrawer({
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="p-5">
         <h4 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">
           <MessageSquare className="size-3.5" /> Notes
         </h4>
@@ -985,20 +993,20 @@ function TaskDrawer({
           onChange={(event) => setNoteDraft(event.target.value)}
           placeholder="Private implementation note"
           rows={4}
-          className="w-full resize-none border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          className="w-full resize-none border border-neutral-800 bg-neutral-950 px-4 py-3 text-sm leading-6 outline-none focus:border-neutral-500"
         />
         <button
           type="button"
           onClick={addNote}
           disabled={disabled}
-          className="mt-2 flex h-9 w-full items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
+          className="mt-3 flex h-11 w-full items-center justify-center gap-2 bg-neutral-100 px-3 text-sm font-semibold text-neutral-950 disabled:opacity-40"
         >
           <Plus className="size-4" /> Add note
         </button>
 
-        <div className="mt-4 max-h-72 space-y-3 overflow-y-auto">
+        <div className="mt-5 max-h-72 space-y-3 overflow-y-auto">
           {task.comments.map((comment) => (
-            <div key={comment.id} className="border border-neutral-800 p-3">
+            <div key={comment.id} className="border border-neutral-800 p-4">
               <p className="text-sm text-neutral-200">{comment.body}</p>
               <p className="mt-2 text-xs text-neutral-500">
                 {comment.isPrivate ? "private" : "public"} · {formatDate(comment.createdAt)}
@@ -1013,7 +1021,7 @@ function TaskDrawer({
 
 function DetailCell({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-r border-t border-neutral-800 p-3 even:border-r-0">
+    <div className="border-r border-t border-neutral-800 p-4 even:border-r-0">
       <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">{label}</p>
       <p className="mt-1 font-semibold">{value}</p>
     </div>
