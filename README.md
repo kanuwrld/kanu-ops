@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kanu Ops
 
-## Getting Started
+Solo-founder operations console for projects, branches, task boards, private notes, and activity logs.
 
-First, run the development server:
+Kanu Ops is built as a portfolio-grade product slice: small enough to review quickly, but complete enough to show data modeling, API boundaries, UI discipline, and documentation.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Why This Exists
+
+Solo builders often run several projects at once. Each project has branches of work, delivery goals, review states, and private implementation notes. Generic task trackers can feel heavy for that loop.
+
+Kanu Ops focuses on one workflow:
+
+```text
+project -> branch -> kanban task -> private note -> activity log
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Project sidebar with health, progress, branch, and task counts
+- Branch-focused workspace for goals and delivery progress
+- Dense kanban board with `Open`, `In work`, `Review`, and `Done`
+- Fast task creation without leaving board context
+- Task drawer with status controls, progress, metadata, and private notes
+- SQLite-backed activity log for project, branch, task, and note events
+- Typed repository layer that keeps database access out of React components
+- Seed/reset scripts for fast local demo setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- Next.js App Router
+- React and TypeScript
+- Tailwind CSS
+- Node.js route handlers
+- SQLite via `better-sqlite3`
+- Zod request validation
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+src/app/page.tsx                server entry, reads workspace snapshot
+src/components/ops-console.tsx  interactive product UI
+src/app/api/*                   route handlers for mutations and snapshot reads
+src/lib/db.ts                   SQLite schema, repository functions, activity logging
+src/lib/validators.ts           request validation
+src/lib/types.ts                shared domain types
+scripts/*                       local database seed/reset utilities
+docs/*                          architecture and decisions
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Read more in [docs/architecture.md](docs/architecture.md).
 
-## Deploy on Vercel
+## Local Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm install
+npm run db:reset
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open `http://localhost:3000`.
+
+## Scripts
+
+```bash
+npm run dev        # start local app
+npm run build      # production build
+npm run lint       # lint source
+npm run typecheck  # TypeScript check
+npm run check      # lint + typecheck + build
+npm run db:seed    # seed demo workspace
+npm run db:reset   # reset SQLite database and seed demo data
+```
+
+## Roadmap
+
+- Drag-and-drop task ordering
+- Project-level milestones and delivery dates
+- GitHub repository sync for branch/task context
+- Optional auth layer for hosted multi-user mode
+- FastAPI microservice for project analytics and release-risk scoring
+
+## Portfolio Notes
+
+This repo intentionally avoids overbuilding. Scope stays sharp: clear domain model, useful interface, isolated persistence, validation, logs, docs, and CI.
