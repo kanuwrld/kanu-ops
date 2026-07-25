@@ -4,6 +4,9 @@ Solo-founder operations console for projects, branches, task boards, private not
 
 Kanu Ops is built as a portfolio-grade product slice: small enough to review quickly, but complete enough to show data modeling, API boundaries, UI discipline, and documentation.
 
+> Security boundary: this version is a single-user demo without authentication.
+> Do not expose it as a public multi-user service. See [SECURITY.md](SECURITY.md).
+
 ## Why This Exists
 
 Solo builders often run several projects at once. Each project has branches of work, delivery goals, review states, and private implementation notes. Generic task trackers can feel heavy for that loop.
