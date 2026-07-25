@@ -17,7 +17,7 @@
     "db:reset": "tsx scripts/reset-db.ts"
   },
   "dependencies": {
-    "better-sqlite3": "^12.11.1",
+    "better-sqlite3": "^13.0.1",
     "lucide-react": "^1.24.0",
     "next": "16.2.11",
     "react": "19.2.8",
